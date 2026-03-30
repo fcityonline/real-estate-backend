@@ -10,8 +10,29 @@ export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const fetchNotification = useNotificationStore((state) => state.fetch);
   
+//   useEffect(() => {
+//   setSocket(io(import.meta.env.VITE_SOCKET_URL));
+// }, []);
+
   useEffect(() => {
-  setSocket(io(import.meta.env.VITE_SOCKET_URL));
+  const socketUrl = import.meta.env.VITE_SOCKET_URL;
+
+  console.log("SOCKET URL:", socketUrl); // debug
+
+  if (!socketUrl) {
+    throw new Error("❌ VITE_SOCKET_URL is not defined");
+  }
+
+  const s = io(socketUrl, {
+    withCredentials: true,
+    transports: ["websocket"], // important for Render
+  });
+
+  setSocket(s);
+
+  return () => {
+    s.disconnect();
+  };
 }, []);
 
   useEffect(() => {

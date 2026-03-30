@@ -3,9 +3,17 @@ import { Server } from "socket.io";
 // const io = new Server({
 //   cors: { origin: "http://localhost:5173" },
 // });
+const parseOrigins = (value) =>
+  String(value || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL,
+  "https://real-estate-frontend-neon-chi.vercel.app",
+  ...parseOrigins(process.env.CLIENT_URL),
+  ...parseOrigins(process.env.FRONTEND_URL),
 ].filter(Boolean);
 
 const io = new Server({

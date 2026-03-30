@@ -15,17 +15,15 @@ export const SocketContextProvider = ({ children }) => {
 // }, []);
 
   useEffect(() => {
-  const socketUrl = import.meta.env.VITE_SOCKET_URL;
+  const socketUrl =
+    import.meta.env.VITE_SOCKET_URL ??
+    "https://real-estate-backend-socket.onrender.com";
 
   console.log("SOCKET URL:", socketUrl); // debug
 
-  if (!socketUrl) {
-    throw new Error("❌ VITE_SOCKET_URL is not defined");
-  }
-
   const s = io(socketUrl, {
     withCredentials: true,
-    transports: ["websocket"], // important for Render
+    transports: ["websocket", "polling"],
   });
 
   setSocket(s);

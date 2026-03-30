@@ -47,15 +47,25 @@ const authLimiter = rateLimit({
 });
 
 // CORS
+const parseOrigins = (value) =>
+  String(value || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL,
+  "https://real-estate-frontend-neon-chi.vercel.app",
+  ...parseOrigins(process.env.CLIENT_URL),
+  ...parseOrigins(process.env.FRONTEND_URL),
 ].filter(Boolean);
+
+const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || uniqueAllowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("CORS not allowed"));

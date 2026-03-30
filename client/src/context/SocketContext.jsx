@@ -9,8 +9,7 @@ export const SocketContextProvider = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
   const [socket, setSocket] = useState(null);
   const fetchNotification = useNotificationStore((state) => state.fetch);
-
-  // useEffect(() => setSocket(io("http://localhost:4000")), []);
+  
   useEffect(() => {
   setSocket(io(import.meta.env.VITE_SOCKET_URL));
 }, []);

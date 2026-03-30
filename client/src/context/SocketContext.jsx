@@ -10,7 +10,10 @@ export const SocketContextProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const fetchNotification = useNotificationStore((state) => state.fetch);
 
-  useEffect(() => setSocket(io("http://localhost:4000")), []);
+  // useEffect(() => setSocket(io("http://localhost:4000")), []);
+  useEffect(() => {
+  setSocket(io(import.meta.env.VITE_SOCKET_URL));
+}, []);
 
   useEffect(() => {
     if (currentUser && socket) socket.emit("newUser", currentUser.id);

@@ -1,7 +1,24 @@
 import { Server } from "socket.io";
 
+// const io = new Server({
+//   cors: { origin: "http://localhost:5173" },
+// });
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_URL,
+];
+
 const io = new Server({
-  cors: { origin: "http://localhost:5173" },
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
+    credentials: true,
+  },
 });
 
 let onlineUsers = [];
@@ -36,5 +53,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => removeUser(socket.id));
 });
 
-io.listen(4000);
-console.log("🚀 Socket server running on port 4000");
+const PORT = process.env.PORT || 4000;
+io.listen(PORT);
+
+console.log(`🚀 Socket server running on port ${PORT}`);
+
+// io.listen(4000);
+// console.log("🚀 Socket server running on port 4000");

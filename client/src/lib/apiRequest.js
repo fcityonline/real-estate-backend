@@ -1,12 +1,13 @@
 import axios from "axios";
 
-// const apiRequest = axios.create({
-//   baseURL: "http://localhost:8800/api",
-//   withCredentials: true,
-// });
+const baseURL =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, "") ||
+  "http://localhost:8800";
+
 const apiRequest = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + "/api",
+  baseURL: `${baseURL}/api`,
   withCredentials: true,
+  timeout: 10000, // 10s
 });
 
 export default apiRequest;

@@ -6,7 +6,7 @@ import { Server } from "socket.io";
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.CLIENT_URL,
-];
+].filter(Boolean);
 
 const io = new Server({
   cors: {

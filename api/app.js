@@ -56,16 +56,34 @@ const parseOrigins = (value) =>
 const allowedOrigins = [
   "http://localhost:5173",
   "https://real-estate-frontend-neon-chi.vercel.app",
+  "https://real-estate-frontend-git-main-contactfcityonline-7758s-projects.vercel.app",
+  "https://fcityonline-real-estate.vercel.app",
   ...parseOrigins(process.env.CLIENT_URL),
   ...parseOrigins(process.env.FRONTEND_URL),
 ].filter(Boolean);
 
 const uniqueAllowedOrigins = [...new Set(allowedOrigins)];
 
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       if (!origin || uniqueAllowedOrigins.includes(origin)) {
+//         callback(null, true);
+//       } else {
+//         callback(new Error("CORS not allowed"));
+//       }
+//     },
+//     credentials: true,
+//   })
+// );
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || uniqueAllowedOrigins.includes(origin)) {
+      if (
+        !origin || 
+        origin.includes("vercel.app") ||  // ✅ allows all Vercel previews
+        uniqueAllowedOrigins.includes(origin)
+      ) {
         callback(null, true);
       } else {
         callback(new Error("CORS not allowed"));

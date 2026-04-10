@@ -1,8 +1,32 @@
 import { createServer } from "http";
+import express from "express";
 import { Server } from "socket.io";
 
-// Create HTTP server
-const httpServer = createServer();
+const app = express();
+const httpServer = createServer(app);
+
+// Health check endpoints (must be before Socket.IO)
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "real-estate-socket",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    onlineUsers: onlineUsers.length,
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    onlineUsers: onlineUsers.length,
+  });
+});
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 // CORS helper
 const parseOrigins = (value) =>
@@ -75,41 +99,6 @@ io.on("connection", (socket) => {
     removeUser(socket.id);
     console.log("User disconnected:", socket.id);
   });
-});
-
-// Health check endpoints via HTTP (for UptimeRobot monitoring)
-httpServer.on("request", (req, res) => {
-  if (req.method === "GET" && req.url === "/") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        status: "ok",
-        service: "real-estate-socket",
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        onlineUsers: onlineUsers.length,
-      })
-    );
-    return;
-  }
-
-  if (req.method === "GET" && req.url === "/health") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(
-      JSON.stringify({
-        status: "healthy",
-        timestamp: new Date().toISOString(),
-        onlineUsers: onlineUsers.length,
-      })
-    );
-    return;
-  }
-
-  if (req.method === "GET" && req.url === "/api/health") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status: "ok" }));
-    return;
-  }
 });
 
 // Start server

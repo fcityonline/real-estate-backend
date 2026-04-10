@@ -77,6 +77,41 @@ io.on("connection", (socket) => {
   });
 });
 
+// Health check endpoints via HTTP (for UptimeRobot monitoring)
+httpServer.on("request", (req, res) => {
+  if (req.method === "GET" && req.url === "/") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        status: "ok",
+        service: "real-estate-socket",
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        onlineUsers: onlineUsers.length,
+      })
+    );
+    return;
+  }
+
+  if (req.method === "GET" && req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        status: "healthy",
+        timestamp: new Date().toISOString(),
+        onlineUsers: onlineUsers.length,
+      })
+    );
+    return;
+  }
+
+  if (req.method === "GET" && req.url === "/api/health") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "ok" }));
+    return;
+  }
+});
+
 // Start server
 const PORT = process.env.PORT || 10000;
 

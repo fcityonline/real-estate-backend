@@ -38,8 +38,6 @@ const globalLimiter = rateLimit({
   max: 300,
 });
 
-app.use(globalLimiter);
-
 // Rate limiting for auth-heavy endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -93,6 +91,30 @@ app.use(
   })
 );
 
+// Health check endpoints (NOT rate-limited for monitoring services)
+app.get("/", (req, res) => {
+  res.status(200).json({ 
+    status: "ok",
+    service: "real-estate-backend",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy",
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+// Apply global rate limiting to all routes (excluding health endpoints already defined)
+app.use(globalLimiter);
+
 // Routes
 app.use("/api/auth", authLimiter, authRoute);
 app.use("/api/users", userRoute);
@@ -102,11 +124,6 @@ app.use("/api/messages", messageRoute);
 app.use("/api/inquiries", inquiryRoute);
 app.use("/api/bookings", bookingRoute);
 app.use("/api/ai", aiRoute);
-
-// Health check
-app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
-});
 
 // Global error handler
 app.use((err, req, res, next) => {
